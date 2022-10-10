@@ -4,12 +4,14 @@ elapsedMillis timeElapsed;
 int RPWM = 10;
 int LPWM = 11;
 
+int DEBUG = 0;
 
 int downPin = 12;
 //int downPin = 4;
 
 
-int upPin = 13;
+//int upPin = 13;
+int upPin = 2;
 //int upPin = 6;
 
 int autoPin = 8;
@@ -47,9 +49,10 @@ void setup() {
  
   Serial.begin(9600);
   // maxAnalogReading = moveToLimit(1); // otwieracie monitor portu szeregowego i odczytujecie wartoscii poprzez sterowanie potenjometrem, w jakim zakresie ma działać was siłownik, usuwacie movetolimit(1) i zmieniacie np na 937
-  maxAnalogReading = 690; // 701;
+  maxAnalogReading = 858; // 701;
   // minAnalogReading = moveToLimit(-1) ; // otwieracie monitor portu szeregowego i odczytujecie wartoscii poprzez sterowanie potenjometrem, w jakim zakresie ma działać was siłownik, usuwacie movetolimit(-1) i zmieniacie np na 242
-  minAnalogReading = 328; //317;
+  // minAnalogReading = 328; //317;
+  minAnalogReading = 4;
  
 }
 
@@ -63,17 +66,22 @@ void loop() {
   int speedval = (mspeed - 238)/1.77;
   if (speedval > 250) { speedval = 250; }
 
+
+if ( DEBUG == 1) {
   Serial.print("manPin");   Serial.print(digitalRead(manPin)==LOW);   Serial.print("autoPin");   Serial.println(digitalRead(autoPin)==LOW);
   Serial.print("speed");   Serial.print(speedval);
-  delay(50);
-
- 
+  //delay(500);
+}
+  delay(47);
+   
   if(digitalRead(manPin)==LOW)
   {
+    if (DEBUG == 1) { 
     Serial.println("automat");
     Serial.println(digitalRead(upPin)==LOW);
     Serial.println(digitalRead(downPin)==LOW);
     //delay(100);
+    }
   if(digitalRead(upPin)==LOW){ //wysuwaj jesli guzik jest wcisniety
     analogWrite(RPWM, 0);
     analogWrite(LPWM, speedval);
@@ -108,7 +116,17 @@ void loop() {
     driveActuator(0, 0);
   }
 
-  if (1) {
+  
+ 
+  }
+ 
+  else{ //jesli zaden przycisk trybu nie jest przelaczony, stoj
+    analogWrite(RPWM, 0);
+    analogWrite(LPWM, 0);    
+  }
+
+
+  if ( DEBUG == 1) {
     Serial.print("potVal: "); //po ustaleniu zakresy pracy na potencjometrze można usunąć ten kod od tej linijki do delay(10)
     Serial.print(potVal);
     Serial.print("\tsensorVal: ");
@@ -118,13 +136,6 @@ void loop() {
     Serial.println(speedval);
 
     delay(10);
-  }
- 
-  }
- 
-  else{ //jesli zaden przycisk trybu nie jest przelaczony, stoj
-    analogWrite(RPWM, 0);
-    analogWrite(LPWM, 0);    
   }
 }
 
@@ -147,22 +158,21 @@ int moveToLimit(int Direction){  //po ustaleniu zakresy pracy na potencjometrze 
 void driveActuator(int Direction, int mspeed){
   switch(Direction){
     case 1:       //wsuwanie
-      Serial.println("wysuwam");
+      if (DEBUG == 1) { Serial.println("wysuwam"); }
       analogWrite(RPWM, mspeed);
       analogWrite(LPWM, 0);
       break;
    
     case 0:       //stop
-      Serial.println("STOP");
+      if (DEBUG == 1) { Serial.println("STOP"); }
       analogWrite(RPWM, 0);
       analogWrite(LPWM, 0);
       break;
  
     case -1:      //wysuwanie
-      Serial.println("chowie");
+      if (DEBUG == 1) { Serial.println("chowie"); }
       analogWrite(RPWM, 0);
       analogWrite(LPWM, mspeed);
       break;
   }
 }
-
