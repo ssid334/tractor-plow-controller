@@ -1,3 +1,3 @@
 
 
-This is sketch for controlling tractor plug.
+This is sketch for controlling tractor plow.
